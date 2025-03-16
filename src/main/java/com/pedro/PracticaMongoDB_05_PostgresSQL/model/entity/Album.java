@@ -19,10 +19,12 @@ public class Album {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ColumnDefault("nextval('album_id_seq')")
     @Column(name = "id", nullable = false)
+    @JsonIgnore
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grupo_id")
+    @JsonBackReference
     private Grupo grupo;
 
     @Size(max = 255)

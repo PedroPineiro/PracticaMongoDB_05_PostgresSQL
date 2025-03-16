@@ -1,5 +1,6 @@
 package com.pedro.PracticaMongoDB_05_PostgresSQL.model.dto;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
@@ -7,7 +8,6 @@ import java.time.LocalDate;
 
 public class AlbumDTO {
 
-    private Integer id;
     private Integer grupoID;
     private String titulo;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -17,13 +17,6 @@ public class AlbumDTO {
     public AlbumDTO() {
     }
 
-    public AlbumDTO(Integer id, Integer grupoID, String titulo, LocalDate dataLanzamento, BigDecimal puntuacion) {
-        this.id = id;
-        this.grupoID = grupoID;
-        this.titulo = titulo;
-        this.dataLanzamento = dataLanzamento;
-        this.puntuacion = puntuacion;
-    }
 
     public AlbumDTO(Integer grupoID, String titulo, LocalDate dataLanzamento, BigDecimal puntuacion) {
         this.grupoID = grupoID;
@@ -33,15 +26,6 @@ public class AlbumDTO {
     }
 
     // getter y setter
-
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public Integer getGrupoID() {
         return grupoID;

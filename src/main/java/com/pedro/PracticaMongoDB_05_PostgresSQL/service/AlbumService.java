@@ -23,12 +23,18 @@ public class AlbumService {
         this.servicioMongo = servicioMongo;
     }
 
-    public void crearAlbum(Album album) {
-        if (!grupoRepository.existsById(album.getGrupo().getId())) {
-            throw new IdException("El ID del grupo no existe: " + album.getGrupo().getId());
+    public void crearAlbum(AlbumDTO albumDTO) {
+        if (albumDTO.getGrupoID() == null) {
+            throw new IdException("El ID del grupo no puede ser nulo.");
         }
+
+        Grupo grupo = grupoRepository.findById(albumDTO.getGrupoID())
+                .orElseThrow(() -> new IdException("El ID del grupo no existe: " + albumDTO.getGrupoID()));
+
+        Album album = new Album(grupo, albumDTO.getTitulo(), albumDTO.getDataLanzamento(), albumDTO.getPuntuacion());
         albumRepository.save(album);
     }
+
 
     public List<Album> listarAlbumes() {
         return albumRepository.findAll();
@@ -39,13 +45,22 @@ public class AlbumService {
                 .orElseThrow(() -> new IdException("No se encontró un álbum con el ID: " + id));
     }
 
-    public void actualizarAlbum(Integer id, Album album) {
-        if (!albumRepository.existsById(id)) {
-            throw new IdException("No se puede actualizar, el ID del álbum no existe: " + id);
-        }
-        album.setId(id); // Asegurar que el ID no cambie
-        albumRepository.save(album);
+    public void actualizarAlbum(Integer id, AlbumDTO albumDTO) {
+        Album albumExistente = albumRepository.findById(id)
+                .orElseThrow(() -> new IdException("No se puede actualizar, el ID del álbum no existe: " + id));
+
+        Grupo grupo = grupoRepository.findById(albumDTO.getGrupoID())
+                .orElseThrow(() -> new IdException("El ID del grupo no existe: " + albumDTO.getGrupoID()));
+
+        // Mantener el ID y actualizar solo los valores necesarios
+        albumExistente.setGrupo(grupo);
+        albumExistente.setTitulo(albumDTO.getTitulo());
+        albumExistente.setDataLanzamento(albumDTO.getDataLanzamento());
+        albumExistente.setPuntuacion(albumDTO.getPuntuacion());
+
+        albumRepository.save(albumExistente);
     }
+
 
     public void eliminarAlbum(Integer id) {
         if (!albumRepository.existsById(id)) {
@@ -63,22 +78,38 @@ public class AlbumService {
      */
 
     public void createAlbumService(AlbumDTO albumDTO) {
-        // Obtener el grupo por su ID
         Grupo grupo = grupoRepository.findById(albumDTO.getGrupoID())
                 .orElseThrow(() -> new IdException("El grupo con el ID " + albumDTO.getGrupoID() + " no existe"));
 
-        // Crear el álbum
         Album album = new Album(grupo, albumDTO.getTitulo(), albumDTO.getDataLanzamento(), albumDTO.getPuntuacion());
 
-        // Guardar el álbum en PostgreSQL
-        albumRepository.save(album);  // Aquí se genera el ID automáticamente
+        // 🔹 Guardar en PostgreSQL
+        album = albumRepository.save(album);
+        albumRepository.flush(); // 🔹 Asegurar que el ID se genera
 
-        // Asignar el ID generado al DTO
-        albumDTO.setId(album.getId());  // Ahora el ID no es nulo
+        if (album.getId() == null) {
+            throw new RuntimeException("El ID del álbum es null después de guardarlo en PostgreSQL");
+        }
 
-        // Llamar al servicio de MongoDB
-        servicioMongo.crearAlbum(albumDTO);
+        System.out.println("Álbum guardado en PostgreSQL con ID: " + album.getId());
+
+        AlbumDTO albumMongoDTO = new AlbumDTO(grupo.getId(),
+                album.getTitulo(), album.getDataLanzamento(), album.getPuntuacion());
+
+        System.out.println("Enviando a MongoDB con los siguientes datos:");
+        System.out.println("ID: " + album.getId());
+        System.out.println("Grupo ID: " + albumMongoDTO.getGrupoID());
+        System.out.println("Título: " + albumMongoDTO.getTitulo());
+        System.out.println("Fecha de lanzamiento: " + albumMongoDTO.getDataLanzamento());
+        System.out.println("Puntuación: " + albumMongoDTO.getPuntuacion());
+
+        // 🔹 Llamar al servicio de MongoDB
+        servicioMongo.crearAlbum(albumMongoDTO);
     }
+
+
+
+
 
     /**
      * metodo para borrar un album por id en postgreSQL y mongoService

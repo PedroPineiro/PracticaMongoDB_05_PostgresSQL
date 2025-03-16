@@ -20,9 +20,9 @@ public class AlbumController {
     }
 
     @PostMapping("/crearPostgres")
-    public ResponseEntity<String> crearAlbum(@RequestBody Album album) {
+    public ResponseEntity<String> crearAlbum(@RequestBody AlbumDTO albumDTO) {
         try {
-            albumService.crearAlbum(album);
+            albumService.crearAlbum(albumDTO);
             return ResponseEntity.ok().body("Álbum creado correctamente");
         } catch (IdException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -52,9 +52,9 @@ public class AlbumController {
     }
 
     @PutMapping("/actualizar/{id}")
-    public ResponseEntity<String> actualizarAlbum(@PathVariable Integer id, @RequestBody Album album) {
+    public ResponseEntity<String> actualizarAlbum(@PathVariable Integer id, @RequestBody AlbumDTO albumDTO) {
         try {
-            albumService.actualizarAlbum(id, album);
+            albumService.actualizarAlbum(id, albumDTO);
             return ResponseEntity.ok().body("Álbum actualizado correctamente");
         } catch (IdException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
