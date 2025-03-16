@@ -1,8 +1,9 @@
 package com.pedro.PracticaMongoDB_05_PostgresSQL.service;
 
 import com.pedro.PracticaMongoDB_05_PostgresSQL.exceptions.IdException;
-import com.pedro.PracticaMongoDB_05_PostgresSQL.model.Album;
-import com.pedro.PracticaMongoDB_05_PostgresSQL.model.Grupo;
+import com.pedro.PracticaMongoDB_05_PostgresSQL.model.dto.AlbumDTO;
+import com.pedro.PracticaMongoDB_05_PostgresSQL.model.entity.Album;
+import com.pedro.PracticaMongoDB_05_PostgresSQL.model.entity.Grupo;
 import com.pedro.PracticaMongoDB_05_PostgresSQL.repository.AlbumRepository;
 import com.pedro.PracticaMongoDB_05_PostgresSQL.repository.GrupoRepository;
 import org.springframework.stereotype.Service;
@@ -55,20 +56,56 @@ public class AlbumService {
 
     // Metodos de ServicioMongo
 
-    public void createAlbumService(Album album) {
-        // Guardar el álbum en PostgreSQL
-        albumRepository.save(album);
+    /**
+     * Metodo para crear un album y que se cree en mongoService
+     *
+     * @param albumDTO el ablum DTO a crear
+     */
 
-        // Llamar al Feign Client para guardar el álbum en MongoDB
-        servicioMongo.crearAlbum(album);
+    public void createAlbumService(AlbumDTO albumDTO) {
+        // Obtener el grupo por su ID
+        Grupo grupo = grupoRepository.findById(albumDTO.getGrupoID())
+                .orElseThrow(() -> new IdException("El grupo con el ID " + albumDTO.getGrupoID() + " no existe"));
+
+        // Crear el álbum
+        Album album = new Album(grupo, albumDTO.getTitulo(), albumDTO.getDataLanzamento(), albumDTO.getPuntuacion());
+
+        // Guardar el álbum en PostgreSQL
+        albumRepository.save(album);  // Aquí se genera el ID automáticamente
+
+        // Asignar el ID generado al DTO
+        albumDTO.setId(album.getId());  // Ahora el ID no es nulo
+
+        // Llamar al servicio de MongoDB
+        servicioMongo.crearAlbum(albumDTO);
     }
 
+    /**
+     * metodo para borrar un album por id en postgreSQL y mongoService
+     *
+     * @param id el id del album
+     * @return un mensaje indicando si se borro o no
+     */
     public boolean borrarAlbumByIdService(Integer id) {
-        if(!albumRepository.existsById(id)) {
+        if (!albumRepository.existsById(id)) {
             return false;
         }
         albumRepository.deleteById(id);
         servicioMongo.borrarAlbumLlamada(id);
         return true;
+    }
+
+    /**
+     * Metodo para obtener un grupo y saber si existe por su id o no
+     *
+     * @param albumDTO la DTO para buscar al grupo
+     * @return el objeto Grupo
+     */
+    private Grupo getGrupo(AlbumDTO albumDTO) {
+        Grupo grupo = grupoRepository.findByid(albumDTO.getGrupoID());
+        if (grupo == null) {
+            throw new IdException("El grupo con el id " + albumDTO.getGrupoID() + " no existe");
+        }
+        return grupo;
     }
 }

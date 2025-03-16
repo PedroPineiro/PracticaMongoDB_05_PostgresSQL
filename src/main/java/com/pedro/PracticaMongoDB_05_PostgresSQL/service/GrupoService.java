@@ -1,8 +1,9 @@
 package com.pedro.PracticaMongoDB_05_PostgresSQL.service;
 
 import com.pedro.PracticaMongoDB_05_PostgresSQL.exceptions.IdException;
-import com.pedro.PracticaMongoDB_05_PostgresSQL.model.Album;
-import com.pedro.PracticaMongoDB_05_PostgresSQL.model.Grupo;
+import com.pedro.PracticaMongoDB_05_PostgresSQL.model.dto.AlbumDTO;
+import com.pedro.PracticaMongoDB_05_PostgresSQL.model.dto.GrupoDTO;
+import com.pedro.PracticaMongoDB_05_PostgresSQL.model.entity.Grupo;
 import com.pedro.PracticaMongoDB_05_PostgresSQL.repository.GrupoRepository;
 import org.springframework.stereotype.Service;
 
@@ -49,20 +50,31 @@ public class GrupoService {
 
     // Metodos de ServicioMongo
 
-    public void createGrupoService(Grupo grupo) {
+    public void createGrupoService(GrupoDTO grupoDTO) {
+        // Convertir el DTO a entidad
+        Grupo grupo = new Grupo();
+        grupo.setNome(grupoDTO.getNome());
+        grupo.setXenero(grupoDTO.getXenero());
+        grupo.setDataFormacion(grupoDTO.getDataFormacion());
+
         // Guardar el grupo en PostgreSQL
         grupoRepository.save(grupo);
 
-        // Llamar al Feign Client para guardar el álbum en MongoDB
-        servicioMongo.crearGrupoLlamada(grupo);
+        // Llamar al Feign Client para guardar el grupo en MongoDB
+        servicioMongo.crearGrupoLlamada(grupoDTO);
     }
 
     public boolean borrarGrupoByIdService(Integer id) {
-        if(!grupoRepository.existsById(id)) {
+        if (!grupoRepository.existsById(id)) {
             return false;
         }
+
+        // Borrar el grupo en PostgreSQL
         grupoRepository.deleteById(id);
+
+        // Llamar al Feign Client para borrar el grupo en MongoDB
         servicioMongo.borrarGrupoLlamada(id);
+
         return true;
     }
 }

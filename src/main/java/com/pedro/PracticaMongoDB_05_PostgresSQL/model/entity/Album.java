@@ -1,4 +1,4 @@
-package com.pedro.PracticaMongoDB_05_PostgresSQL.model;
+package com.pedro.PracticaMongoDB_05_PostgresSQL.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.ColumnDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,12 +19,10 @@ public class Album {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ColumnDefault("nextval('album_id_seq')")
     @Column(name = "id", nullable = false)
-    @JsonIgnore
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grupo_id")
-    @JsonBackReference
     private Grupo grupo;
 
     @Size(max = 255)
@@ -32,6 +31,7 @@ public class Album {
     private String titulo;
 
     @Column(name = "data_lanzamento")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataLanzamento;
 
     @Column(name = "puntuacion", precision = 3, scale = 1)

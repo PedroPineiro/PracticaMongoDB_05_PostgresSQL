@@ -1,6 +1,6 @@
 package com.pedro.PracticaMongoDB_05_PostgresSQL.repository;
 
-import com.pedro.PracticaMongoDB_05_PostgresSQL.model.Album;
+import com.pedro.PracticaMongoDB_05_PostgresSQL.model.entity.Album;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

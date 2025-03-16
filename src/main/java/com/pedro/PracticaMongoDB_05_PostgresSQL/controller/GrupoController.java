@@ -1,10 +1,9 @@
 package com.pedro.PracticaMongoDB_05_PostgresSQL.controller;
 
 import com.pedro.PracticaMongoDB_05_PostgresSQL.exceptions.IdException;
-import com.pedro.PracticaMongoDB_05_PostgresSQL.model.Album;
-import com.pedro.PracticaMongoDB_05_PostgresSQL.model.Grupo;
+import com.pedro.PracticaMongoDB_05_PostgresSQL.model.dto.GrupoDTO;
+import com.pedro.PracticaMongoDB_05_PostgresSQL.model.entity.Grupo;
 import com.pedro.PracticaMongoDB_05_PostgresSQL.service.GrupoService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +15,6 @@ public class GrupoController {
 
     private final GrupoService grupoService;
 
-    @Autowired
     public GrupoController(GrupoService grupoService) {
         this.grupoService = grupoService;
     }
@@ -77,13 +75,13 @@ public class GrupoController {
 
     /**
      * Segundo metodo para crear el objeto en postgres pero usando una llamada a mongoService
-     * @param grupo el objeto a insertar en las bases de datos
+     * @param grupoDTO el objeto a insertar en las bases de datos
      * @return un mensaje indicando si se creó o no
      */
-    @PostMapping("/crear")
-    public ResponseEntity<String> createGrupoLlmadaPostgreSQLController(@RequestBody Grupo grupo) {
+    @PostMapping("/crearMongo")
+    public ResponseEntity<String> createGrupoLlamadaPostgreSQLController(@RequestBody GrupoDTO grupoDTO) {
         try{
-            grupoService.createGrupoService(grupo);
+            grupoService.createGrupoService(grupoDTO);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -95,7 +93,7 @@ public class GrupoController {
      * @param id el id del grupo
      * @return un mensaje indicando si se borró o no el registro
      */
-    @DeleteMapping("/borrar/{id}")
+    @DeleteMapping("/borrarMongo/{id}")
     public ResponseEntity<String> borrarGrupoByIdLlamadaPostgreSQLController(@PathVariable Integer id) {
         try{
             boolean eliminado = grupoService.borrarGrupoByIdService(id);

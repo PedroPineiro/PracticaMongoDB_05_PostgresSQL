@@ -1,4 +1,4 @@
-package com.pedro.PracticaMongoDB_05_PostgresSQL.model;
+package com.pedro.PracticaMongoDB_05_PostgresSQL.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.ColumnDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ public class Grupo {
     private String xenero;
 
     @Column(name = "data_formacion")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataFormacion;
 
     @OneToMany(mappedBy = "grupo")

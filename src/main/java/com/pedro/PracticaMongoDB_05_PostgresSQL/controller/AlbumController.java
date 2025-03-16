@@ -1,9 +1,9 @@
 package com.pedro.PracticaMongoDB_05_PostgresSQL.controller;
 
 import com.pedro.PracticaMongoDB_05_PostgresSQL.exceptions.IdException;
-import com.pedro.PracticaMongoDB_05_PostgresSQL.model.Album;
+import com.pedro.PracticaMongoDB_05_PostgresSQL.model.dto.AlbumDTO;
+import com.pedro.PracticaMongoDB_05_PostgresSQL.model.entity.Album;
 import com.pedro.PracticaMongoDB_05_PostgresSQL.service.AlbumService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +15,6 @@ public class AlbumController {
 
     private final AlbumService albumService;
 
-    @Autowired
     public AlbumController(AlbumService albumService) {
         this.albumService = albumService;
     }
@@ -76,14 +75,14 @@ public class AlbumController {
 
     /**
      * Metodo para crear un album en postgreSQL y llamar a mongoService
-     * @param album el album DTO a crear en postgreSQL y mongoService
+     * @param albumDTO el album DTO a crear en postgreSQL y mongoService
      * @return un mensaje indicando si se creo o no
      */
-    @PostMapping("/crear")
-    public ResponseEntity<String> createNewAlbumLlamadaPostgreSQLController(@RequestBody Album album) {
-        try{
-            albumService.createAlbumService(album);
-        }catch (Exception e){
+    @PostMapping("/crearMongo")
+    public ResponseEntity<String> createNewAlbumLlamadaPostgreSQLController(@RequestBody AlbumDTO albumDTO) {
+        try {
+            albumService.createAlbumService(albumDTO);
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
         return ResponseEntity.ok().body("Album creado correctamente en llamada");
@@ -94,7 +93,7 @@ public class AlbumController {
      * @param id el id del album a borrar en ambas bases de datos
      * @return un mensaje indicando si se borró o no
      */
-    @DeleteMapping("/borrar/{id}")
+    @DeleteMapping("/borrarMongo/{id}")
     public ResponseEntity<String> borrarAlbumByIdLlamadaPostgreSQLController(@PathVariable Integer id) {
         try{
             boolean eliminado = albumService.borrarAlbumByIdService(id);
